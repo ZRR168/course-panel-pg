@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}课程安排表{% endblock %}
+{% block content %}
+<div class="schedule-head">
+  <h2>课程安排表 · 助教认领</h2>
+  <div class="legend">
+    <span class="dot open"></span>待认领
+    <span class="dot claimed"></span>已认领
+    <span class="dot locked"></span>已锁定
+    <span class="live" id="live">● 实时同步已连接</span>
+  </div>
+</div>
+<div id="board" class="board"><p class="muted">加载中…</p></div>
+
+<div class="feed">
+  <h4>同步动态（所有人实时可见）</h4>
+  <ul id="feedList"><li class="muted">加载中…</li></ul>
+</div>
+
+<!-- 认领弹窗 -->
+<div id="claimModal" class="modal">
+  <div class="modal-box">
+    <h3 id="claimTitle">认领席位</h3>
+    <p id="claimInfo" class="sub"></p>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeClaim()">取消</button>
+      <button class="btn primary" id="claimOk">确认认领</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.SUPABASE_URL = "{{ supabase_url }}";
+  window.SUPABASE_ANON_KEY = "{{ supabase_anon_key }}";
+  window.CURRENT_USER = {
+    id: {{ g.user.id }},
+    name: "{{ g.user.display_name }}",
+    role: "{{ g.user.role }}",
+    scope: {{ g.user.claim_scope | tojson }}
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+{% endblock %}
