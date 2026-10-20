@@ -315,7 +315,17 @@ def admin_toggle(uid):
 
 @app.route("/healthz")
 def healthz():
-    return jsonify({"ok": True, "time": datetime.utcnow().isoformat()})
+    """诊断接口：数据库连通性 + 账号/席位数（不含敏感信息）"""
+    info = {"ok": True, "db": False, "users": None, "sessions": None}
+    try:
+        d = db()
+        info["db"] = True
+        info["users"] = d.query(User).count()
+        info["sessions"] = d.query(CourseSession).count()
+        d.close()
+    except Exception as e:  # noqa: BLE001
+        info["error"] = str(e)[:200]
+    return jsonify(info)
 
 
 if __name__ == "__main__":

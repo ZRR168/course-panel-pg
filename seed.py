@@ -103,8 +103,9 @@ def seed(db=None):
         Base.metadata.create_all(engine)
         db = SessionLocal()
 
-    admin_pw = os.environ.get("ADMIN_DEFAULT_PASSWORD", "Admin@2026snail")
-    ta_pw = os.environ.get("TA_DEFAULT_PASSWORD", "Ta@2026snail")
+    # 统一初始密码：管理员与助教均为 123456（首次登录强制改密）
+    admin_pw = "123456"
+    ta_pw = "123456"
 
     if not db.query(User).filter_by(username="amanda").first():
         db.add(User(
@@ -141,6 +142,16 @@ def seed(db=None):
         print(f"[seed] 写入 {len(SESSIONS)} 个课程席位")
     else:
         print(f"[seed] 席位已存在（{existing} 条），跳过")
+
+    # ---- 密码重置：所有"尚未完成首次改密"的账号统一重置为 123456 ----
+    # 已改过密码（must_change_pw=False）的账号不受影响
+    reset_cnt = 0
+    for u in db.query(User).filter_by(must_change_pw=True).all():
+        u.password_hash = generate_password_hash("123456")
+        reset_cnt += 1
+    if reset_cnt:
+        db.commit()
+        print(f"[seed] 已将 {reset_cnt} 个未激活账号的密码重置为 123456")
 
     if own:
         db.close()
