@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}总览看板{% endblock %}
+{% block content %}
+<h2>总览看板</h2>
+<div class="stats">
+  <div class="stat"><div class="num">{{ total }}</div><div class="lbl">总席位</div></div>
+  <div class="stat ok"><div class="num">{{ claimed }}</div><div class="lbl">已认领</div></div>
+  <div class="stat warn"><div class="num">{{ total - claimed }}</div><div class="lbl">待认领</div></div>
+</div>
+
+<h3>各模块认领进度</h3>
+<div class="modules">
+  {% for code in module_order %}
+  <div class="mod-card">
+    <div class="mod-name">{{ by_module[code].name }} <small>{{ code }}</small></div>
+    <div class="bar"><div class="bar-fill" style="width:{{ (by_module[code].claimed / by_module[code].total * 100) if by_module[code].total else 0 }}%"></div></div>
+    <div class="mod-num">{{ by_module[code].claimed }} / {{ by_module[code].total }}</div>
+  </div>
+  {% endfor %}
+</div>
+
+<h3>最近动态（同步信息）</h3>
+<ul class="activity">
+  {% for a in recent %}
+  <li><span class="time">{{ a.created_at.strftime('%m-%d %H:%M') }}</span>
+      <b>{{ users.get(a.user_id, '系统') }}</b> · {{ a.message }}</li>
+  {% else %}
+  <li class="muted">暂无动态</li>
+  {% endfor %}
+</ul>
+{% endblock %}
