@@ -1,0 +1,22 @@
+# Render 部署配置：新建独立 Web Service，自动获得新的 onrender.com 网址
+# （与现有 course-panel.onrender.com 不同）。环境变量在 Render 后台手动填入。
+services:
+  - type: web
+    name: course-panel-pg
+    runtime: python
+    plan: free
+    region: singapore
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: ADMIN_DEFAULT_PASSWORD
+        sync: false
