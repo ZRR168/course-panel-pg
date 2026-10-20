@@ -42,7 +42,8 @@ C:\Users\thinkpad\WorkBuddy\2026-10-20-02-06-40\course-panel-pg
 | `SUPABASE_URL` | `https://qacfaayziralpntyvhrq.supabase.co` |
 | `SUPABASE_ANON_KEY` | `sb_publishable_MGFnJZEvwjdgxEChmZ5OFQ_L6J_KVnI` |
 | `SECRET_KEY` | `EvQuYFePkhAxFk7EHkHxYVy77GK2w6Ix5vMXvrpb7yI` |
-| `ADMIN_DEFAULT_PASSWORD` | `Amanda@2026!Snail` |
+
+> 初始密码已统一为 `123456`（管理员与助教相同），无需再配置密码类环境变量。
 
 > 若顶部实时同步显示「同步未连接」，说明 `SUPABASE_ANON_KEY` 填错了（手打易错）——回到 Supabase **API Keys** 页，点 Publishable key 的 📋 复制，重新粘贴到这一项即可。
 
@@ -55,9 +56,9 @@ C:\Users\thinkpad\WorkBuddy\2026-10-20-02-06-40\course-panel-pg
   ```
   **它和现有 course-panel.onrender.com 不同**，这就是新面板入口。
 - 免费层首次访问会"冷启动"几秒，多刷新一次。
-- 首次打开会自动建表 + 灌入数据（约 1–2 秒），之后即可登录：
-  - **管理员**：`amanda` / `Amanda@2026!Snail`（登录后按提示**先改密码**）
-  - **助教**：`grace` `zrr` `mandy` `jason` `sean` `michael`，初始密码 `Ta@2026snail`（首次登录需改密）
+- 首次打开会自动建表 + 灌入数据（约 1–2 秒），之后即可登录（**所有人初始密码统一为 `123456`**，登录后按提示先改密码）：
+  - **管理员**：`amanda` / `123456`
+  - **助教**：`grace` `zrr` `mandy` `jason` `sean` `michael` / `123456`
 - 助教登录后到「课程安排表」认领席位；所有人都能看到实时同步动态。
 
 ## 排错
