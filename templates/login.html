@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}登录 · 课程安排系统{% endblock %}
+{% block content %}
+<div class="login-wrap">
+  <div class="login-card">
+    <h2>🐌 蜗牛AI 课程安排面板</h2>
+    <p class="sub">助教登录后认领课程席位</p>
+    <form method="post" action="{{ url_for('login') }}">
+      <label>用户名</label>
+      <input type="text" name="username" autofocus required>
+      <label>密码</label>
+      <input type="password" name="password" required>
+      <button type="submit" class="btn primary block">登 录</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
