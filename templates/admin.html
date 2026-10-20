@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}助教与权限管理{% endblock %}
+{% block content %}
+<h2>助教与权限管理</h2>
+
+<div class="card">
+  <h3>新增助教账号</h3>
+  <form id="addUser" class="inline-form">
+    <input name="username" placeholder="用户名（英文）" required>
+    <input name="display_name" placeholder="显示名" required>
+    <input name="password" placeholder="初始密码" value="Ta@2026snail">
+    <button class="btn primary" type="submit">创建</button>
+  </form>
+</div>
+
+<table class="users">
+  <thead>
+    <tr><th>用户名</th><th>显示名</th><th>角色</th><th>可认领模块</th><th>状态</th><th>操作</th></tr>
+  </thead>
+  <tbody>
+  {% for u in users %}
+    <tr>
+      <td>{{ u.username }}</td>
+      <td>{{ u.display_name }}</td>
+      <td>{{ '管理员' if u.role=='admin' else '助教' }}</td>
+      <td class="scope">
+        {% for code in module_order %}
+          <label class="chk"><input type="checkbox" data-uid="{{ u.id }}" data-mod="{{ code }}"
+            {{ 'checked' if (u.claim_scope and code in u.claim_scope) or (not u.claim_scope) else '' }}
+            {{ 'disabled' if u.role=='admin' else '' }}>{{ modules[code] }}</label>
+        {% endfor %}
+        <small class="muted">（留空=可认领全部）</small>
+      </td>
+      <td>
+        {% if u.active %}<span class="tag ok">启用</span>{% else %}<span class="tag off">停用</span>{% endif %}
+      </td>
+      <td class="ops">
+        <button class="btn sm" onclick="resetPw({{ u.id }})">重置密码</button>
+        {% if u.role != 'admin' %}
+        <button class="btn sm" onclick="toggleUser({{ u.id }}, this)">{{ '停用' if u.active else '启用' }}</button>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const MODULES = {{ modules | tojson }};
+async function postJSON(url, body){
+  const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(body)});
+  return r.json();
+}
+document.getElementById('addUser').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const f = e.target;
+  const res = await postJSON('/api/admin/user', {
+    username: f.username.value.trim().toLowerCase(),
+    display_name: f.display_name.value.trim(),
+    password: f.password.value
+  });
+  alert(res.ok ? '创建成功' : ('失败：' + res.msg));
+  if(res.ok) location.reload();
+});
+document.querySelectorAll('input[data-uid]').forEach(cb=>{
+  cb.addEventListener('change', async ()=>{
+    const uid = cb.dataset.uid;
+    const mods = [...document.querySelectorAll(`input[data-uid="${uid}"]:checked`)].map(x=>x.dataset.mod);
+    const res = await postJSON(`/api/admin/user/${uid}/scope`, {scope: mods});
+    if(!res.ok) alert('更新失败：' + res.msg);
+  });
+});
+async function resetPw(uid){
+  const pw = prompt('输入新密码（默认 Ta@2026snail）：', 'Ta@2026snail');
+  if(pw===null) return;
+  const res = await postJSON(`/api/admin/user/${uid}/reset`, {password: pw});
+  alert(res.ok ? '已重置，该助教下次需用新密码登录并改密' : ('失败：'+res.msg));
+}
+async function toggleUser(uid, btn){
+  const res = await postJSON(`/api/admin/user/${uid}/toggle`, {});
+  if(res.ok){ btn.textContent = res.active ? '停用' : '启用'; location.reload(); }
+  else alert('失败：'+res.msg);
+}
+</script>
+{% endblock %}
